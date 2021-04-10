@@ -1,23 +1,51 @@
-import logo from "./logo.svg";
-import "./App.css";
+import React, { useState } from "react";
+
+const config = {
+  apiUrl: "https://type.fit/api/quotes",
+};
 
 function App() {
+  const [quotes, setQuotes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const Quote = ({ text, author }) => {
+    return (
+      <span>
+        <strong>{text}</strong> &nbsp; <span>{author}</span>
+      </span>
+    );
+  };
+
+  const getQuotes = () => {
+    setQuotes([]);
+    setIsLoading(true);
+    fetch(config.apiUrl)
+      .then(function (response) {
+        return response.json();
+      })
+      .then((data) => {
+        setQuotes(data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button
+        onClick={() => getQuotes()}
+        type="primary"
+        disabled={isLoading}
+        size="large"
+      >
+        Fetch Quotes
+      </button>
+      <ul>
+        {quotes.map((quote) => (
+          <Quote text={quote.text} author={quote.author}></Quote>
+        ))}
+      </ul>
     </div>
   );
 }
